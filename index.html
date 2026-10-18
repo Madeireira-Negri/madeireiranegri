@@ -1462,6 +1462,22 @@ tr.ac-late td{background:color-mix(in srgb,var(--neg) 4%,transparent)}
 /* funções dos funcionários */
 .fn-t th,.fn-t td{text-align:left!important}.fn-t th:nth-child(4),.fn-t td:nth-child(4){text-align:center!important}.fn-r{cursor:pointer}.fn-r td{vertical-align:top}.fn-t td{padding-top:12px!important;padding-bottom:12px!important}
 .fn-pend{font-size:11.5px;font-weight:700;color:#B45309;background:#FEF3C7;border-radius:999px;padding:2px 9px}
+
+/* ===== pente fino ===== */
+.topbar .crumbs{flex:0 1 auto;min-width:0}
+@media(max-width:1340px){.topbar .crumbs #crGroup,.topbar .crumbs .sep{display:none}}.topbar .ck-btn{flex:none}
+.mix{grid-template-columns:repeat(3,minmax(0,1fr))}.mix label{min-width:0}.mix select{width:100%;min-width:0}
+html[data-theme="dark"] .rex-page .rx-t th,html[data-theme="dark"] .rex-page .rx-t td,.rex-page .rx-t th,.rex-page .rx-t td{background:#fff!important;color:#111827!important;border-color:#EEF0F4!important}
+.rex-page .rx-t thead th{color:#6B7280!important;font-size:10.5px;text-transform:uppercase;letter-spacing:.04em}
+.rex-page .rx-t tr.b td{border-top:1.5px solid #111827!important}
+@media(max-width:760px){
+ .rex-page{padding:18px 14px;min-height:0;width:100%}
+ .rx-h{flex-wrap:wrap}.rx-h h1{font-size:18px}.rx-d{margin-left:0;width:100%}
+ .rx-2{grid-template-columns:1fr}
+ .rex-page .rx-t{display:block;overflow-x:auto;white-space:nowrap}
+ #v-ciclo .chart{overflow-x:auto}#v-ciclo .chart svg{min-width:760px}
+ #v-rel table{display:block;max-width:100%;overflow-x:auto}
+}
 </style>
 </head>
 <body>
@@ -4360,6 +4376,26 @@ document.addEventListener('click',e=>{const g=e.target.closest('[data-ctbgo]');i
   const s=e.target.closest('[data-sub]');if(s){const [v,a]=s.dataset.sub.split('|');goSub(v,a);}},true);
 document.addEventListener('keydown',e=>{if(!SUBV[ST.view]||e.altKey===false) return;if(e.key!=='ArrowRight'&&e.key!=='ArrowLeft') return;const L=SUBV[ST.view],i=L.indexOf(subOf(ST.view)),j=i+(e.key==='ArrowRight'?1:-1);if(L[j]){e.preventDefault();goSub(ST.view,L[j].a);}});
 if(document.getElementById('app')&&document.getElementById('app').classList.contains('on')){buildNav();applySub();}
+
+/* ================= AJUSTES DO PENTE FINO ================= */
+/* tooltip não fica preso na tela ao trocar de aba ou redesenhar */
+(function(){let last=null;document.addEventListener('mouseover',e=>{last=e.target.closest&&e.target.closest('[data-tip]');},true);
+  const hide=()=>{const t=document.getElementById('tip');if(t) t.classList.remove('on');};
+  const _shTip=show;show=function(v){hide();return _shTip.apply(this,arguments);};
+  new MutationObserver(()=>{if(last&&!last.isConnected){hide();last=null;}}).observe(document.body,{childList:true,subtree:true});
+  document.addEventListener('mouseleave',hide);window.addEventListener('blur',hide);document.addEventListener('click',e=>{if(e.target.closest&&e.target.closest('[data-tip]')) return;hide();},true);})();
+/* busca rápida (Ctrl+K) também encontra as ramificações, ações e funções */
+const _cmdIdxFx=cmdIndex;cmdIndex=function(){const L=_cmdIdxFx();const add=(t,g,act,s)=>L.push({t,g,act,s:s||'',n:norm(t+' '+(s||'')+' '+g)});
+  if(typeof SUBV!=='undefined') Object.entries(SUBV).forEach(([v,arr])=>{if(!canView(v)) return;arr.forEach(x=>add(x.l,'Seção',()=>goSub(v,x.a),SUBSEC[v]));});
+  if(canView('acao')) acGet().forEach(x=>add(x.a,'Ação',()=>{show('acao');acForm(x);},'Plano de ação · '+x.ar));
+  if(canView('rh')) fnGet().forEach(x=>add(x.f,'Função',()=>{goSub('rh','rh-func');},'Funções dos funcionários · '+x.s));
+  if(canView('alr')) ALR.forEach(a=>add(a.t,'Alerta',()=>show('alr'),'Alertas'));
+  return L;};
+
+/* chaves de análise vertical/horizontal não ocupam espaço nas abas em que não se aplicam */
+const _shTg=show;show=function(v){const r=_shTg.apply(this,arguments);document.querySelectorAll('.tgl-top').forEach(t=>{t.style.display=t.style.visibility==='hidden'?'none':'';});return r;};
+/* rótulos curtos nas chaves AV/AH para o caminho da página não ser cortado */
+document.querySelectorAll('.tgl-top').forEach(t=>{const lab=t.dataset.tg==='av'?'Vertical':'Horizontal';[...t.childNodes].forEach(n=>{if(n.nodeType===3&&n.textContent.trim()) n.textContent=lab;});t.dataset.tip=t.dataset.tg==='av'?'Análise vertical: cada valor como % da base':'Análise horizontal: variação entre os períodos';t.setAttribute('aria-label',t.dataset.tg==='av'?'Análise vertical':'Análise horizontal');});
 
 </script>
 </body>
