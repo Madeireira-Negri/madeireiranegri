@@ -3078,7 +3078,7 @@ function renderIni(){
 
 
 /* ================= APRESENTAÇÃO DE DEFESA (SLIDES) ================= */
-const DK={i:0,full:false,notes:true,over:false,t0:null,timer:null,sim:{v:0,p:0,f:0}};
+const DK={i:0,full:false,notes:true,over:false,t0:null,timer:null,sim:{v:0,p:0,m:0,f:0,k:null}};
 const fv=(i,k)=>DATA.financeiro[i].vals[k];
 function tv(pair,type,extra){const v=pair&&pair[0];const t=type==='pct'?fP(v):type==='num'?fN(v,2):type==='m0'?'R$ '+fM0(v):'R$ '+fM(v);return pair&&pair[1]?`<span class="tv" data-src="${esc(pair[1])}" title="Clique para ver o cálculo">${t}${extra||''}</span>`:t}
 function dkHidden(){try{return JSON.parse(lsGet('cvl-dk-hidden','[]'))}catch(e){return []}}
@@ -3105,8 +3105,6 @@ function card2(k,v,d,cls){return `<div class="s-kp ${cls||''}"><span>${k}</span>
 function buildSlides(){
   const T=TCCDOC,R=fv(0,TI)[0],rec=k=>fv(0,k);
   const itens=DATA.fat.reduce((a,M)=>a+(M.itens_total||0),0);
-  const s0=ABC.per,s1=ABC.semGrupo;ABC.per=TI;ABC.semGrupo=true;const AB=abcList();ABC.per=s0;ABC.semGrupo=s1;
-  const cnt={A:[0,0],B:[0,0],C:[0,0]};AB.L.forEach(x=>{cnt[x.cls][0]++;cnt[x.cls][1]+=x.v});
   const cats=DATA.custos.filter(c=>!c.kind),tg=cats.reduce((a,c)=>a+(c.vals[TI][0]||0),0);
   const totc=DATA.custos.find(c=>c.kind==='total');const agg={};(totc?totc.detalhes:[]).forEach(d=>{agg[d.desc]=(agg[d.desc]||0)+(d.valor[0]||0)});
   const top=Object.entries(agg).sort((a,b)=>b[1]-a[1]).slice(0,5);
@@ -3128,21 +3126,47 @@ function buildSlides(){
      ${card2('Teórica','Para a área','A análise CVL como modelo de simulação para a gestão de curto prazo (Garrison; Noreen; Brewer, 2021; Martins, 2023).')}
      ${card2('Social','Para a região','Saúde financeira e longevidade da empresa mantêm empregos locais e favorecem práticas sustentáveis.')}</div><p class="s-note">Linha de pesquisa: Contabilidade Gerencial e Controladoria.</p>`,
    notes:'Três níveis de justificativa: prático, teórico e social. Citar a linha de pesquisa.'},
+  {id:'ref1',sec:'Referencial teórico',title:'Contabilidade de custos e gerencial',view:'met',html:()=>`<div class="s-q sm">A contabilidade gerencial é um sistema de informações voltado à administração do negócio, feito sob medida para apoiar as decisões dos gestores (Padoveze, 2022).</div>
+     <div class="g2 mt">${card2('Comportamento frente ao volume','Fixos × variáveis','Os variáveis acompanham a produção, como a matéria-prima; os fixos se mantêm na faixa relevante (Garrison; Noreen; Brewer, 2021). Errar a classificação distorce a margem de contribuição (Leone, 2000).')}${card2('Identificação com o produto','Diretos × indiretos','Os diretos são medidos em cada unidade ou lote (Wernke, 2023); os indiretos dependem de rateios e estimativas, o que traz subjetividade à análise (Martins, 2023).')}</div>
+     <div class="s-callout sm">Separar custo de despesa e entender como os gastos reagem ao volume é o ponto de partida de qualquer análise gerencial segura (Martins, 2023; Iudícibus, 2017).</div>`,
+   notes:'Seção 2.1 do artigo. Mostrar as duas classificações que sustentam a análise: comportamento (fixo × variável), base da análise CVL, e identificação com o produto (direto × indireto).'},
+  {id:'ref2',sec:'Referencial teórico',title:'Empresas familiares, profissionalização e sucessão',view:'tema',html:()=>`<div class="g3">
+     ${card2('Base da economia','Riqueza e estabilidade','Família, patrimônio e administração se misturam; o objetivo vai além do lucro imediato (Ahmad, 2025).')}
+     ${card2('Fragilidade','Informalidade','Sem separar o caixa da empresa dos gastos da família, cresce o risco de confusão patrimonial (Gallon; Salamoni; Da Costa, 2010; Assaf Neto, 2021).')}
+     ${card2('Sucessão','Fase crítica','A filosofia do fundador precisa ser transmitida aos herdeiros para evitar rupturas (Barros; Formiga; Vasconcelos, 2021).')}</div>
+     <div class="s-callout">Controles internos e ferramentas gerenciais formais garantem a perenidade na transição entre gerações (IBGC, 2023). A contabilidade gerencial funciona como um <b>idioma neutro</b>, que transforma a experiência dos fundadores em dados organizados para os sucessores (Giovannoni; Maraghini; Riccaboni, 2011).</div>`,
+   notes:'Seção 2.2 do artigo. Ligar a teoria ao caso: empresa familiar em sucessão precisa trocar o conhecimento tácito por controles formais.'},
   {id:'ref',sec:'Referencial teórico',title:'Análise custo-volume-lucro: os indicadores',view:'met',html:()=>`<table class="s-tb"><thead><tr><th>Indicador</th><th>Como se calcula</th><th>Para que serve</th></tr></thead><tbody>
      ${[['mc','Receita − (custos variáveis + despesas variáveis)'],['pec','(Custos fixos + despesas fixas) ÷ índice de MC'],['pee','Gastos fixos ÷ (índice de MC − meta de lucro de 20%)'],['pef','(Gastos fixos − depreciação + dívidas) ÷ índice de MC'],['gao','Margem de contribuição ÷ lucro operacional'],['ms','(Receita − PEC) ÷ receita']].map(([k,f])=>`<tr><td><b>${esc(CON[k].t)}</b></td><td class="fx">${esc(f)}</td><td>${esc(CON[k].p)}</td></tr>`).join('')}</tbody></table>
      <p class="s-note">Premissas do modelo: comportamento linear de custos e receitas na faixa relevante e mix de vendas constante (Horngren; Datar; Rajan, 2020).</p>`,
    notes:'Explicar a lógica: a margem de contribuição paga a estrutura fixa; os pontos de equilíbrio mostram o mínimo de vendas; GAO e margem de segurança medem o risco.'},
-  {id:'met',sec:'Metodologia',title:'Procedimentos metodológicos',view:'met',html:()=>`<div class="g2"><div>${bullets(['<b>Descritiva</b>: observar e registrar a realidade da empresa sem interferir.','<b>Estudo de caso</b> em uma única organização (Yin, 2015).','<b>Quali-quantitativa</b>: cálculo dos indicadores e interpretação à luz da realidade da empresa (Minayo, 2014).','Sujeitos: gestores atuais e sucessores — amostragem intencional (Gil, 2019).'])}</div><div><h4>Coleta e análise</h4>${bullets(['Análise documental: relatórios de vendas, notas e documentos de custos.','Observação não participante no chão de fábrica.','Entrevistas semiestruturadas com a família gestora.'])}<div class="s-mini"><span>Base de cálculo do painel</span><b>Maio a julho de 2026 · 21 grupos de madeira · ${(totc?totc.detalhes.length:0)} lançamentos de gastos</b></div></div></div>`,
-   notes:'Descrever o tipo de pesquisa e as três frentes de coleta. Explicar que os dados quantitativos foram consolidados no painel, com conciliação do faturamento e classificação de cada gasto.'},
-  {id:'emp',sec:'Estudo de caso',title:'A empresa e o processo produtivo',view:'ini',html:()=>`<div class="g2"><div><p>Indústria familiar da região de <b>São Miguel do Oeste (SC)</b>, que beneficia madeira do desdobro das toras aos produtos finais. Gestão centralizada nos fundadores, em <b>transição para a terceira geração</b>. A empresa preferiu não ser identificada.</p><div class="s-tags"><span>Pinheiro</span><span>Pinus</span><span>Pinus tratado</span><span>Eucalipto</span></div></div><div class="s-flow">${['Matéria-prima','Desdobro','Beneficiamento','Tratamento e acabamento','Venda'].map((x,i)=>`<div><i>${i+1}</i>${x}</div>`).join('')}</div></div>
-     <div class="g4 mt">${card2('Faturamento do trimestre',tv(fv(0,TI),'m0'))}${card2('Volume vendido',tv(DATA.summary[1].cell,'num',' m³'))}${card2('Itens vendidos',fN(itens,0))}${card2('Grupos de madeira','21')}</div>`,
-   notes:'Apresentar a empresa sem identificá-la. Percorrer o fluxo produtivo. Os números do trimestre dão a dimensão da operação.'},
+  {id:'ref3',sec:'Referencial teórico',title:'Margem, alavancagem e o setor madeireiro',view:'met',html:()=>`<div class="g2"><div><h4>Margem, alavancagem e equilíbrio</h4>${bullets(['A margem de contribuição indica os produtos mais vantajosos e orienta o mix de vendas (Crepaldi; Crepaldi, 2022).','A alavancagem operacional é um multiplicador: quanto mais custos fixos, mais volátil o lucro (Assaf Neto, 2021; Leone, 2000).','O ponto de equilíbrio econômico trata o lucro esperado pelos sócios como um custo a cobrir (Wernke, 2023).'])}</div>
+     <div><h4>Setor madeireiro secundário</h4>${bullets(['O aproveitamento de cada tora traz incerteza ao custo variável por unidade (Bhering; Menezes, 2021).','Resíduos e subprodutos devem entrar na contabilidade, pois aliviam os custos da linha principal (Silva; Coan, 2015; Leone, 2000).','A competitividade depende da eficiência energética e do aproveitamento dos recursos florestais (MAPA, 2026).'])}</div></div>`,
+   notes:'Seções 2.3.1 e 2.4 do artigo. Mostrar por que margem, alavancagem e as variações do ponto de equilíbrio importam, e as particularidades de custo do beneficiamento de madeira.'},
+  {id:'met',sec:'Metodologia',title:'Procedimentos metodológicos',view:'met',html:()=>`<div class="g2"><div><h4>Classificação da pesquisa</h4>${bullets(['<b>Descritiva</b>: observa e registra a realidade da empresa sem interferir.','<b>Estudo de caso</b> em uma única organização (Yin, 2015).','<b>Quali-quantitativa</b>: cálculo dos indicadores e interpretação à luz da realidade da empresa (Minayo, 2014).','<b>Sujeitos</b>: gestores atuais e sucessores, por amostragem intencional (Gil, 2019).'])}</div>
+     <div><h4>Coleta e tratamento dos dados</h4>${bullets(['Análise documental dos relatórios de pedidos de vendas ('+fN(itens,0)+' itens), do levantamento de custos e despesas e dos balancetes mensais.','Itens reunidos em 21 agrupamentos, 9 principais; volume convertido em m³ pelas dimensões de cada item.','Gastos classificados em custos e despesas, fixos e variáveis; Simples Nacional entre as despesas variáveis.','Meta de lucro de 20% sobre as vendas confirmada com a gestão.'])}<div class="s-mini"><span>Período analisado</span><b>Maio a julho de 2026 · dados coletados em setembro e outubro de 2026</b></div></div></div>`,
+   notes:'Descrever a pesquisa: descritiva, estudo de caso, quali-quantitativa. Explicar as três fontes documentais e como os dados foram organizados na planilha e no painel, com cada indicador rastreável até a origem.'},
+  {id:'hist',sec:'A empresa estudada',title:'História e estrutura da empresa',view:'emp',cls:'s-hist',html:()=>{const h=histGet(),C=(typeof CFG!=='undefined'&&CFG)||RAW.CFG,ps=String(h.txt||'').split(/\n\s*\n/).map(p=>p.trim()).filter(p=>p&&!/Editar história/i.test(p)).slice(0,2);
+     const A=C.areas||[],F=C.func||RAW.CFG.func||[],top=A[0]||['Sócios','Gestão geral'],rest=A.slice(1);
+     const nf=a=>F.filter(f=>f.s===a||(a===top[0]&&f.s==='Gestão')).length,lb=n=>n?`<i>${n} ${n>1?'funções':'função'}</i>`:'';
+     return `<div class="hs"><div class="hs-l">${MED&&MED.logo?`<img class="hs-logo" src="${MED.logo}" alt="Logo da empresa">`:''}${ps.map(p=>`<p>${esc(p)}</p>`).join('')}
+       <h4>Linha do tempo</h4><ol class="hs-tl">${(h.tl||[]).map(([y,t])=>`<li><b>${esc(y)}</b><span>${esc(t)}</span></li>`).join('')}</ol></div>
+      <div class="hs-r"><h4>Estrutura organizacional</h4><div class="org"><div class="org-hd"><b>${esc(top[0])}</b><span>${esc(top[1])}</span>${lb(nf(top[0]))}</div><div class="org-ln" style="--n:${rest.length}"></div>
+       <div class="org-row" style="--n:${rest.length}">${rest.map(([n,d])=>`<div><b>${esc(n)}</b><span>${esc(d)}</span>${lb(nf(n))}</div>`).join('')}</div></div>
+       <div class="s-tags">${[C.cidade,C.perfil,C.gestao,C.regime].filter(Boolean).map(t=>`<span>${esc(t)}</span>`).join('')}</div></div></div>`},
+   notes:'Contar a trajetória da empresa: fundação pela primeira geração, a segunda geração na gestão e a transição atual para a terceira. Mostrar como a empresa se organiza. O texto, a linha do tempo e o logo vêm da aba Estrutura da empresa › Editar história.'},
+  {id:'emp',sec:'A empresa estudada',title:'Processo produtivo e porte da operação',view:'ini',html:()=>{const C=(typeof CFG!=='undefined'&&CFG)||RAW.CFG;return `<div class="s-flow2">${(C.processo||[]).map(([t,d],i)=>`<div><i>${i+1}</i><b>${esc(t)}</b><span>${esc(d)}</span></div>`).join('')}</div>
+     <div class="g4 mt">${card2('Faturamento do trimestre',tv(fv(0,TI),'m0'))}${card2('Volume vendido',tv(DATA.summary[1].cell,'num',' m³'))}${card2('Itens vendidos',fN(itens,0))}${card2('Grupos de madeira','21')}</div>`},
+   notes:'Percorrer o fluxo produtivo, do desdobro das toras à entrega. Os números do trimestre dão a dimensão da operação. A empresa preferiu não ser identificada.'},
+  {id:'gas',sec:'Resultados',title:'Classificação dos custos e despesas',view:'cus',html:()=>{const mx=Math.max(...cats.map(c=>c.vals[TI][0]));return `<div class="g2"><div><h4>Gastos do trimestre: ${tv(totc.vals[TI],'m0')} (${fP(tg/R)} da receita)</h4>${cats.map(c=>hbar(c.cat,c.vals[TI][0],mx,c.vals[TI][1],fP(c.vals[TI][0]/R)+' da receita',/Vari/.test(c.cat)?'cv':'cf')).join('')}</div><div><h4>Maiores gastos</h4><table class="s-tb sm"><tbody>${top.map(([d,v])=>`<tr><td>${esc(d)}</td><td class="r">R$ ${fM0(v)}</td><td class="r">${fP(v/tg)}</td></tr>`).join('')}</tbody></table><div class="s-callout sm">Variáveis: <b>${fP((fv(1,TI)[0])/R)}</b> da receita · Fixos: <b>${fP(fv(2,TI)[0]/R)}</b> da receita</div></div></div>`},
+   notes:'Objetivo específico (a): os gastos foram classificados em fixos e variáveis. A matéria-prima domina os variáveis e a folha de produção domina os fixos.'},
   {id:'fat',sec:'Resultados',title:'Faturamento do período',view:'fat',html:()=>`<div class="g2w"><div>${vbars(MI.map(k=>({l:M[k],v:rec(k)[0],src:rec(k)[1],sub:k?('AH '+(varH(rec(k)[0],rec(k-1)[0])>0?'+':'')+fP(varH(rec(k)[0],rec(k-1)[0]))):''})),{w:600,h:330})}</div><div class="kcol">${card2('Trimestre',tv(fv(0,TI),'m0'),'soma dos 21 grupos em cada mês')}${card2('Ticket médio','R$ '+fM0(R/itens),`${fM0(R)} ÷ ${fN(itens,0)} itens`)}${card2('Preço médio por m³','R$ '+fM0(R/DATA.summary[1].cell[0]),`${fM0(R)} ÷ ${fN(DATA.summary[1].cell[0],1)} m³`)}</div></div>`,
    notes:'Junho caiu em relação a maio e julho foi o melhor mês. Clicar numa barra mostra a soma dos 21 grupos que forma o faturamento do mês.'},
-  {id:'abc',sec:'Resultados',title:'Mix de produtos — curva ABC',view:'abc',html:()=>{const L=AB.L.slice(0,12),mx=L[0].v;return `<div class="g2w"><div class="s-abc">${L.map((x,i)=>`<div class="s-abc-r" data-abc="${AB.L.indexOf(x)}"><span class="cls ${x.cls}">${x.cls}</span><b>${esc(x.x.nome)}</b><div class="s-hb-t"><i class="c${x.cls}" style="width:${(x.v/mx*100).toFixed(1)}%"></i></div><em>${fP(x.p)}</em><em class="acc">${fP(x.pa)}</em></div>`).join('')}<p class="s-note">Mostrando os 12 maiores de ${AB.L.length} grupos · clique em um grupo para o detalhamento.</p></div><div class="kcol">${['A','B','C'].map(c=>card2('Classe '+c,fP(cnt[c][1]/AB.T),`${cnt[c][0]} grupos · R$ ${fM0(cnt[c][1])}`,'k'+c)).join('')}</div></div>`},
-   notes:'Sete grupos concentram mais de 80% da receita; os palanques de eucalipto sozinhos fazem 30%. Itens sem agrupamento aparecem na classe A e precisam ser classificados para melhorar a análise.'},
-  {id:'gas',sec:'Resultados',title:'Estrutura de gastos',view:'cus',html:()=>{const mx=Math.max(...cats.map(c=>c.vals[TI][0]));return `<div class="g2"><div><h4>Gastos do trimestre: ${tv(totc.vals[TI],'m0')} (${fP(tg/R)} da receita)</h4>${cats.map(c=>hbar(c.cat,c.vals[TI][0],mx,c.vals[TI][1],fP(c.vals[TI][0]/R)+' da receita',/Vari/.test(c.cat)?'cv':'cf')).join('')}</div><div><h4>Maiores gastos</h4><table class="s-tb sm"><tbody>${top.map(([d,v])=>`<tr><td>${esc(d)}</td><td class="r">R$ ${fM0(v)}</td><td class="r">${fP(v/tg)}</td></tr>`).join('')}</tbody></table><div class="s-callout sm">Variáveis: <b>${fP((fv(1,TI)[0])/R)}</b> da receita · Fixos: <b>${fP(fv(2,TI)[0]/R)}</b> da receita</div></div></div>`},
-   notes:'Objetivo específico (a): os gastos foram classificados em fixos e variáveis. A matéria-prima domina os variáveis e a folha de produção domina os fixos.'},
+  {id:'grp',sec:'Resultados',title:'Faturamento e volume por agrupamento de madeira',view:'fat',html:()=>{const G=DATA.madeiras.filter(x=>!x.isTotal&&x.gnum>=1&&x.gnum<=9&&x.rs[TI][0]>0).sort((a,b)=>b.rs[TI][0]-a.rs[TI][0]);if(!G.length) return '<p>Sem dados de agrupamento.</p>';
+     const mx=G[0].rs[TI][0],T9=G.reduce((a,x)=>a+x.rs[TI][0],0),V9=G.reduce((a,x)=>a+x.m3[TI][0],0),pm=G.filter(x=>x.m3[TI][0]>0).map(x=>[x.rs[TI][0]/x.m3[TI][0],x.nome]),lo=pm.reduce((a,x)=>x[0]<a[0]?x:a),hi=pm.reduce((a,x)=>x[0]>a[0]?x:a);
+     return `<div class="g2w"><table class="s-tb tight grp"><thead><tr><th>Agrupamento</th><th class="r">m³</th><th class="r">Trimestre</th><th class="r">R$/m³</th><th class="r">% receita</th></tr></thead><tbody>${G.map(x=>`<tr><td><b>${esc(x.nome)}</b><div class="s-hb-t"><i style="width:${(x.rs[TI][0]/mx*100).toFixed(1)}%"></i></div></td><td class="r">${tv(x.m3[TI],'num')}</td><td class="r">${tv(x.rs[TI],'m0')}</td><td class="r">${x.m3[TI][0]>0?fM0(x.rs[TI][0]/x.m3[TI][0]):'—'}</td><td class="r">${fP(x.rs[TI][0]/R)}</td></tr>`).join('')}</tbody></table>
+      <div class="kcol">${card2('Nove agrupamentos principais','R$ '+fM0(T9),fP(T9/R)+' da receita · '+fN(V9,2)+' m³')}${card2(G[0].nome,fP(G[0].rs[TI][0]/R)+' da receita',fN(G[0].m3[TI][0],2)+' m³, '+fP(G[0].m3[TI][0]/V9)+' do volume medido')}${card2('Preço médio por m³','R$ '+fM0(lo[0])+' a R$ '+fM0(hi[0]),'volume e valor agregado não caminham juntos')}</div></div>`},
+   notes:'Tabela 3 do artigo. Os palanques de eucalipto lideram a receita e o volume, mas têm o menor preço por m³; o pinus tratado tem o maior. Por isso é importante analisar a margem de cada linha. Os demais agrupamentos (forros, divisórias, assoalhos e decks) são vendidos por m² ou unidade e não foram convertidos em volume.'},
   {id:'mc',sec:'Resultados',title:'Margem de contribuição',view:'fin',html:()=>`<div class="g2w"><div>${vbars(MI.map(k=>({l:M[k],v:fv(5,k)[0],src:fv(5,k)[1],sub:'MC '+fP(fv(6,k)[0])})),{w:600,h:330})}</div><div class="kcol">${card2('MC do trimestre',tv(fv(5,TI),'m0'),tv(fv(0,TI),'m0')+' − '+tv(fv(1,TI),'m0'))}${card2('Índice de MC',tv(fv(6,TI),'pct'),'de cada R$ 100 vendidos, R$ '+fM(fv(6,TI)[0]*100)+' sobram para os fixos')}</div></div>`,
    notes:'Explicar a margem de contribuição de cada mês e o índice. Junho teve a menor receita, mas o maior índice de MC.'},
   {id:'res',sec:'Resultados',title:'Da receita ao resultado — trimestre',view:'fin',html:()=>{const r=fv(0,TI)[0],cv=fv(1,TI)[0],mc=fv(5,TI)[0],cf=fv(2,TI)[0],rs=fv(7,TI)[0],W=1100,H=320,mt=30,mb=44,ph=H-mt-mb,y=v=>mt+ph-v/r*ph,bw=150,gap=(W-5*bw)/6;
@@ -3159,42 +3183,66 @@ function buildSlides(){
    notes:'Mostrar o cruzamento da receita com o custo total: abaixo do ponto há prejuízo, acima há lucro. Traduzir para volume: a empresa precisa vender cerca de um terço do que vendeu para cobrir a estrutura. Clicar nos pontos do gráfico mostra o cálculo.'},
   {id:'risco',sec:'Resultados',title:'Alavancagem operacional e margem de segurança',view:'fin',html:()=>`<div class="g4">${PI.map(k=>`<div class="s-kp"><span>${k<NM?M[k]:'Trimestre'}</span><b>GAO ${tv(fv(11,k),'num')}</b><em>Margem de segurança ${tv(fv(13,k),'pct')}</em><div class="s-ms"><i style="width:${(fv(13,k)[0]*100).toFixed(1)}%"></i></div></div>`).join('')}</div><div class="g2 mt"><div class="s-callout">${esc(CON.gao.r())}</div><div class="s-callout">${esc(CON.ms.r())}</div></div>`,
    notes:'GAO baixo, em torno de 1,5, indica estrutura de custos pouco alavancada: o resultado reage de forma moderada às vendas. A margem de segurança alta mostra folga confortável acima do ponto de equilíbrio.'},
-  {id:'dfcl',sec:'Projeto futuro',title:'DFCL (Projeto Futuro) — fluxo de caixa livre',view:'dfc',html:()=>{const B=k=>BALD.rows.findIndex(x=>x.k===k),bv=(k,i)=>BV(k,i),tdd=(k,i)=>`<span class="tv" data-dfcgo="${B(k)}">${fM0(bv(k,i))}</span>`;
-     const L=[['EBITDA','ebitda'],['Capital de giro','ncg'],['Investimentos','cap'],['Fluxo de caixa livre da empresa','fcle'],['Resultado financeiro e outros',null],['Fluxo de caixa livre do acionista','fcla'],['Lucros distribuídos','div'],['Variação do disponível','dcx']];
-     const fin=i=>bv('rf',i)+bv('or',i)+bv('df',i)+bv('qt',i);
-     return `<table class="s-tb tight"><thead><tr><th>R$</th><th class="r">Maio</th><th class="r">Junho</th><th class="r">Julho</th><th class="r">Trimestre</th></tr></thead><tbody>${L.map(([l,k])=>`<tr${['fcle','fcla','dcx'].includes(k)?' style="font-weight:700"':''}><td>${l}</td>${PI.map(i=>`<td class="r">${k?tdd(k,i):fM0(fin(i))}</td>`).join('')}</tr>`).join('')}</tbody></table>
-     <div class="g3 mt">${card2('Conferência','✓ R$ 0,00','a variação calculada é igual à variação de caixa, bancos e aplicações')}${card2('Fornecedores','R$ '+fM0(-bv('g4',0)-bv('g4',1)),'pagos a mais do que comprado em maio e junho')}${card2('Simples Nacional',fP(-bv('ded',3)/bv('rb',3)),'da receita contabilizada')}</div>`},
-   notes:'A DFCL foi feita pelo método indireto com os balancetes mensais e fecha centavo por centavo com o disponível. Maio e junho tiveram fluxo negativo porque a empresa pagou fornecedores de matéria-prima; julho compensou. Explicar que a receita contabilizada é menor que a dos relatórios de vendas usados na análise CVL — ver a conciliação na aba do painel.'},
-  {id:'simp',sec:'Projeto futuro',title:'Impacto do Simples Nacional na análise CVL',view:'fin',html:()=>{const a=simpCalc(TI,'a'),b=simpCalc(TI,'b'),F=k=>DATA.financeiro[k].vals[TI];
-     const z=simpCalc(TI,'z');const R=[['Índice de MC',fP(z.MCp),tv(F(6),'pct'),fP(b.MCp)],['Resultado gerencial','R$ '+fM0(z.RES),tv(F(7),'m0'),'R$ '+fM0(b.RES)],['Ponto de equilíbrio contábil','R$ '+fM0(z.PEC),tv(F(8),'m0'),'R$ '+fM0(b.PEC)],['Ponto de equilíbrio econômico','R$ '+fM0(z.PEE),tv(F(9),'m0'),'R$ '+fM0(b.PEE)],['Margem de segurança',fP(z.MS),tv(F(13),'pct'),fP(b.MS)],['GAO',fN(z.GAO,2),tv(F(11),'num'),fN(b.GAO,2)]];
-     return `<table class="s-tb"><thead><tr><th>Trimestre</th><th class="r">Sem Simples</th><th class="r">Simples apurado (painel)</th><th class="r">Alíquota efetiva sobre toda a receita</th></tr></thead><tbody>${R.map(r=>`<tr><td><b>${r[0]}</b></td><td class="r">${r[1]}</td><td class="r">${r[2]}</td><td class="r">${r[TI]}</td></tr>`).join('')}</tbody></table><div class="s-callout sm">O Simples incide sobre as vendas e é um gasto variável: reduz a margem de contribuição e eleva os pontos de equilíbrio. Mesmo com o tributo, a empresa segue com folga sobre o equilíbrio.</div>`},
-   notes:'Contribuição adicional: os balancetes mostraram que o Simples Nacional não estava no documento de custos. O Simples apurado passou a integrar os gastos variáveis dos indicadores do painel; esta tabela compara com o cálculo sem o tributo e com a alíquota efetiva aplicada sobre toda a receita.'},
-  {id:'sim',sec:'Resultados',title:'Simulador CVL — e se…?',view:'fin',cls:'s-sim',html:()=>simHtml(),after:()=>simBind(),
-   notes:'Demonstrar ao vivo: mover o volume de vendas e mostrar o novo resultado e a margem de segurança; mostrar que a variação do resultado segue o GAO. Depois testar redução de preço (desconto) e aumento dos custos fixos.'},
+  {id:'mcg',sec:'Resultados',title:'Margem e pontos de equilíbrio por agrupamento',view:'fin',html:()=>{const p=P(TI),G=DATA.madeiras.filter(x=>!x.isTotal&&x.gnum>=1&&x.gnum<=9&&x.rs[TI][0]>0).sort((a,b)=>b.rs[TI][0]-a.rs[TI][0]);let t=[0,0,0,0,0];
+     const rows=G.map(x=>{const r=x.rs[TI][0],q=r/p.R,v=[r,q*p.MC,q*p.PEC,q*p.PEE,q*p.MSv];v.forEach((y,i)=>t[i]+=y);return `<tr><td><b>${esc(x.nome)}</b></td><td class="r">${fM0(v[0])}</td><td class="r">${fM0(v[1])}</td><td class="r">${fM0(v[2])}</td><td class="r">${fM0(v[3])}</td><td class="r">${fM0(v[4])}</td></tr>`;}).join('');
+     return `<table class="s-tb tight grp"><thead><tr><th>Agrupamento (R$)</th><th class="r">Faturamento</th><th class="r">Margem de contribuição</th><th class="r">PE contábil</th><th class="r">PE econômico</th><th class="r">Margem de segurança</th></tr></thead><tbody>${rows}<tr class="tot"><td><b>Nove agrupamentos</b></td>${t.map(y=>`<td class="r"><b>${fM0(y)}</b></td>`).join('')}</tr></tbody></table>
+      <p class="s-note">Valores do trimestre rateados pela participação de cada agrupamento no faturamento, com índice de margem de contribuição de ${fP(p.MCp)} em todos. A falta do custo da matéria-prima por espécie impede margens individuais (Wernke, 2023).</p>`},
+   notes:'Tabela 5 do artigo. Como o rateio é proporcional ao faturamento, o que aparece é a dependência do resultado em poucas linhas: os palanques de eucalipto respondem sozinhos por cerca de 30% da margem. Próximo passo para a gestão: apurar o custo da tora e o rendimento de cada linha.'},
+  {id:'sim',sec:'Resultados',title:'Simulador CVL: e se…?',view:'fin',cls:'s-sim',html:()=>simHtml(),after:()=>simBind(),
+   notes:'Demonstrar ao vivo: escolher o cenário "Queda de 20% nas vendas" e mostrar que a variação do resultado segue o GAO. Depois "Desconto de 10%": o painel mostra quanto o volume teria de crescer para manter o resultado. O Simples acompanha a receita e a matéria-prima acompanha o volume e o próprio custo.'},
+  {id:'prof',sec:'Resultados',title:'Contribuições para a profissionalização e a sucessão',view:'rel',html:()=>`<div class="g2"><div><h4>Estruturação dos dados</h4>${bullets(['Planilha de controle e painel gerencial reúnem vendas, gastos e balancetes em um só lugar.','Totais conciliados com os documentos de origem.','Cada indicador traz conceito, fórmula e memória de cálculo, rastreável até o lançamento.'])}</div>
+     <div><h4>Decisões apoiadas</h4>${bullets(['<b>Preço</b>: efeito de descontos sobre a margem e o equilíbrio.','<b>Mix</b>: foco nas linhas que sustentam a receita.','<b>Gastos</b>: controle da matéria-prima e da folha de produção.','<b>Risco</b>: margem de segurança e alavancagem acompanhadas mês a mês.'])}</div></div>
+     <div class="s-callout sm">Com indicadores objetivos, a nova geração fundamenta decisões em dados verificáveis, o que dá legitimidade ao novo gestor perante a família (Silva; Souza; Santos, 2022).</div>`,
+   notes:'Seção 4.4 do artigo, terceiro objetivo específico. A estruturação dos dados foi tão relevante quanto os próprios indicadores: transforma a experiência dos fundadores em informação transmissível aos sucessores.'},
   {id:'obj',sec:'Discussão',title:'Respostas aos objetivos específicos',view:'apr',html:()=>`<table class="s-tb"><thead><tr><th style="width:34%">Objetivo</th><th>Resultado obtido</th></tr></thead><tbody>
      <tr><td><b>a)</b> Identificar custos fixos, variáveis e despesas</td><td>${(totc?totc.detalhes.length:0)} lançamentos classificados: fixos de ${tv(fv(2,TI),'m0')} e variáveis de ${tv(fv(1,TI),'m0')} no trimestre.</td></tr>
-     <tr><td><b>b)</b> Calcular os indicadores CVL</td><td>MC de ${tv(fv(6,TI),'pct')}, PEC de ${tv(fv(8,TI),'m0')}, PEE de ${tv(fv(9,TI),'m0')}, PEF de ${tv(fv(10,TI),'m0')}, GAO de ${tv(fv(11,TI),'num')} e margem de segurança de ${tv(fv(13,TI),'pct')}; curva ABC com ${cnt.A[0]} grupos na classe A.</td></tr>
+     <tr><td><b>b)</b> Calcular os indicadores CVL</td><td>MC de ${tv(fv(6,TI),'pct')}, PEC de ${tv(fv(8,TI),'m0')}, PEE de ${tv(fv(9,TI),'m0')}, PEF de ${tv(fv(10,TI),'m0')}, GAO de ${tv(fv(11,TI),'num')} e margem de segurança de ${tv(fv(13,TI),'pct')}; palanques de eucalipto com ${fP((DATA.madeiras.find(x=>/palanque/i.test(x.nome))||{rs:[[0],[0],[0],[0]]}).rs[TI][0]/R)} da receita.</td></tr>
      <tr><td><b>c)</b> Demonstrar o apoio à profissionalização</td><td>Painel com memória de cálculo rastreável, conceitos e simulações que transformam os registros da empresa em indicadores de decisão para os sucessores.</td></tr></tbody></table>`,
    notes:'Retomar cada objetivo específico e mostrar onde ele foi atendido. Os valores podem ser abertos para comprovar a origem.'},
-  {id:'cons',sec:'Considerações finais',title:'Considerações finais',view:'rel',html:()=>`<div class="s-ed">${ed('dk-cons',['A empresa operou com margem de contribuição elevada e folga relevante sobre o ponto de equilíbrio em todos os meses do período.','A receita é concentrada em poucos grupos de madeira, o que direciona preço, estoque e esforço comercial.','A matéria-prima e a folha de produção são os principais gastos e devem concentrar o controle.','A análise CVL oferece aos sucessores uma linguagem objetiva para decidir e acompanhar a empresa.'].join('\n'))}</div><p class="s-note">Texto editável: clique e ajuste antes da banca.</p>`,
-   notes:'Conclusões em linguagem simples, ligadas ao problema de pesquisa. Revisar este texto com a orientadora.'},
-  {id:'lim',sec:'Considerações finais',title:'Limitações e estudos futuros',view:'met',html:()=>`<div class="g2"><div><h4>Limitações</h4>${bullets(['Período de três meses de dados.','Compras de matéria-prima usadas como aproximação do custo da matéria-prima vendida.','Parte do faturamento ainda sem agrupamento por produto.'])}</div><div><h4>Estudos futuros</h4>${bullets(['Ampliar a série histórica e incluir sazonalidade.','Margem de contribuição por produto e por m³.','Acompanhar a aplicação do modelo durante a sucessão.','DFCL (Projeto Futuro): fluxo de caixa livre a partir dos balancetes, já iniciado no painel.'])}</div></div>`,
-   notes:'Mostrar maturidade: reconhecer limites dos dados e propor continuidade.'},
+  {id:'cons',sec:'Considerações finais',title:'Considerações finais',view:'rel',html:()=>`<div class="s-ed">${ed('dk-cons-v2',['A análise CVL mostrou-se ferramenta de apoio à decisão: revela quanto cada real vendido contribui para cobrir a estrutura fixa, o mínimo de vendas para não haver prejuízo e a sensibilidade do resultado ao volume.','Os gastos foram classificados, com predomínio da matéria-prima e do Simples Nacional entre os variáveis e da folha de produção entre os fixos.','No trimestre, a margem de contribuição foi de '+fP(fv(6,TI)[0])+', o ponto de equilíbrio contábil de R$ '+fM(fv(8,TI)[0])+' e a margem de segurança de '+fP(fv(13,TI)[0])+'.','A organização dos dados em planilha e painel rastreável oferece aos sucessores uma linguagem comum e verificável para conduzir a transição para a terceira geração.'].join('\n'))}</div><p class="s-note">Texto editável: clique e ajuste antes da banca.</p>`,
+   notes:'Responder ao problema de pesquisa em linguagem simples e retomar os três objetivos específicos.'},
+  {id:'lim',sec:'Considerações finais',title:'Limitações e estudos futuros',view:'met',html:()=>{let rb=null;try{rb=typeof BV==='function'?BV('rb',TI):null}catch(e){}
+     return `<div class="g2"><div><h4>Limitações</h4>${bullets(['Período de apenas três meses de dados.','Receita dos relatórios de vendas (R$ '+fM0(R)+')'+(rb?' maior que a receita contabilizada nos balancetes (R$ '+fM0(rb)+')':' diferente da receita contabilizada')+', a conciliar com a contabilidade.','Compras usadas como aproximação do custo da matéria-prima vendida.','Volume estimado pelas dimensões descritas em cada item.'])}</div><div><h4>Estudos futuros</h4>${bullets(['Ampliar a série histórica para captar a sazonalidade.','Apurar o custo e o rendimento da matéria-prima por espécie para calcular margens por produto.','Incorporar a demonstração do fluxo de caixa à análise.','Acompanhar a aplicação do modelo ao longo do processo sucessório.'])}</div></div>`},
+   notes:'Mostrar maturidade: reconhecer os limites dos dados, principalmente a diferença entre a receita dos relatórios de vendas e a contabilizada, e propor a continuidade.'},
   {id:'fim',cls:'s-cover',title:'',html:()=>ucCover(`${ucWood(510,60,.85)}<div class="uc-end">OBRIGADO PELA ATENÇÃO!</div><div class="uc-end2">Perguntas e contribuições da banca</div><div class="uc-end3">${esc(aut)} · Orientação: ${esc(ori)}<br>Todos os valores apresentados são rastreáveis até o cálculo de origem no painel</div>`),
    notes:'Agradecer e abrir para perguntas. Se a banca questionar algum número, clicar nele para mostrar a origem.'},
   ];
 }
 /* ---- simulador ---- */
-function simCalc(){const s=DK.sim,R=fv(0,TI)[0],CV=fv(1,TI)[0],CF=fv(2,TI)[0];const R2=R*(1+s.v/100)*(1+s.p/100),CV2=CV*(1+s.v/100),CF2=CF*(1+s.f/100),MC2=R2-CV2,RS2=MC2-CF2,MCp2=MC2/R2,PEC2=CF2/MCp2,MS2=(R2-PEC2)/R2;return {R,CV,CF,MC:R-CV,RS:R-CV-CF,R2,CV2,CF2,MC2,RS2,MCp2,PEC2,MS2};}
-function simHtml(){const s=DK.sim;const sl=(k,l,min,max)=>`<label class="sim-s"><span>${l}<b id="sv-${k}">${s[k]>0?'+':''}${s[k]}%</b></span><input type="range" min="${min}" max="${max}" step="1" value="${s[k]}" data-sim="${k}"></label>`;
-  return `<div class="g2w"><div class="sim-ctl">${sl('v','Volume de vendas',-40,40)}${sl('p','Preço de venda',-20,20)}${sl('f','Custos e despesas fixos',-30,30)}<button class="s-btn" data-simreset="1">Voltar ao realizado</button><p class="s-note">Base: período realizado. Premissas do modelo CVL: custos variáveis proporcionais ao volume e fixos constantes na faixa relevante.</p></div><div id="simOut"></div></div>`;}
-function simOut(){const c=simCalc(),d=(a,b)=>`<em class="${a>=b?'up':'dn'}">${a>=b?'▲':'▼'} ${fP(Math.abs(varH(a,b)))}</em>`;
-  const el=document.getElementById('simOut'); if(!el) return;
-  el.innerHTML=`<div class="sim-g">${[['Receita',c.R2,c.R],['Custos e despesas variáveis',c.CV2,c.CV],['Margem de contribuição',c.MC2,c.MC],['Custos e despesas fixos',c.CF2,c.CF],['Resultado',c.RS2,c.RS]].map(([l,a,b],i)=>`<div class="sim-r${i===4?' res':''}"><span>${l}</span><b>R$ ${fM0(a)}</b>${Math.abs(a-b)>0.5?d(a,b):'<em>—</em>'}</div>`).join('')}</div>
-  <div class="g3 mt">${card2('Índice de MC',fP(c.MCp2))}${card2('Ponto de equilíbrio contábil','R$ '+fM0(c.PEC2))}${card2('Margem de segurança',fP(c.MS2),c.MS2<0?'abaixo do equilíbrio':'')}</div>
-  ${DK.sim.v&&!DK.sim.p&&!DK.sim.f?`<div class="s-callout sm">Pelo GAO (${fN(fv(11,TI)[0],2)}), uma variação de ${DK.sim.v}% no volume altera o resultado em cerca de ${fN(fv(11,TI)[0]*DK.sim.v,1)}% — o simulador mostra ${fN(varH(c.RS2,c.RS)*100,1)}%.</div>`:''}`;}
-function simBind(){document.querySelectorAll('[data-sim]').forEach(r=>r.oninput=()=>{DK.sim[r.dataset.sim]=+r.value;const b=document.getElementById('sv-'+r.dataset.sim);if(b)b.textContent=(r.value>0?'+':'')+r.value+'%';simOut();});const rb=document.querySelector('[data-simreset]');if(rb)rb.onclick=()=>{DK.sim={v:0,p:0,f:0};renderDeck();};simOut();}
-
+const SIMPR=[['Realizado',{v:0,p:0,m:0,f:0}],['Desconto de 10%',{v:0,p:-10,m:0,f:0}],['Queda de 20% nas vendas',{v:-20,p:0,m:0,f:0}],['Matéria-prima +15%',{v:0,p:0,m:15,f:0}],['Fixos +10%',{v:0,p:0,m:0,f:10}],['Vendas +15%',{v:15,p:0,m:0,f:0}]];
+function simBase(k){const p=P(k),mes=['Maio','Junho','Julho'],t=DATA.custos.find(c=>c.kind==='total');
+  const S=(t?t.detalhes:[]).filter(d=>/simples/i.test(d.desc)&&(k>=NM||d.mes===mes[k])).reduce((a,d)=>a+(d.valor[0]||0),0);
+  return Object.assign({},p,{S,O:p.CV-S-p.MP});}
+function simCalc(){const s=DK.sim;if(s.k==null) s.k=TI;['v','p','m','f'].forEach(x=>{if(s[x]==null) s[x]=0;});
+  const b=simBase(s.k),v=1+s.v/100,pp=1+s.p/100,m=1+s.m/100,f=1+s.f/100,meta=(typeof CFG!=='undefined'&&CFG.pee!=null)?CFG.pee:.2;
+  const R2=b.R*v*pp,S2=b.S*v*pp,MP2=b.MP*v*m,O2=b.O*v,CV2=S2+MP2+O2,CF2=b.CF*f,MC2=R2-CV2,RS2=MC2-CF2,MCp2=MC2/R2,PEC2=MCp2>0?CF2/MCp2:Infinity,PEE2=MCp2>meta?CF2/(MCp2-meta):Infinity,MS2=(R2-PEC2)/R2,GAO2=RS2>0?MC2/RS2:null,VOL2=b.VOL*v;
+  const unit=b.R*pp-b.S*pp-b.MP*m-b.O,vReq=unit>0?(b.RES+CF2)/unit:Infinity;
+  return {b,meta,R:b.R,CV:b.CV,CF:b.CF,MC:b.MC,RS:b.RES,MCp:b.MCp,PEC:b.PEC,PEE:b.PEE,MS:b.MS,GAO:b.GAO,R2,CV2,CF2,MC2,RS2,MCp2,PEC2,PEE2,MS2,GAO2,VOL2,vReq,pr2:VOL2>0?R2/VOL2:0};}
+function simHtml(){const s=DK.sim;simCalc();const NMS=['Maio','Junho','Julho','Trimestre'];
+  const sl=(k,l,min,max,h)=>`<label class="sim-s"><span>${l}<b id="sv-${k}">${s[k]>0?'+':''}${s[k]}%</b></span><input type="range" min="${min}" max="${max}" step="1" value="${s[k]}" data-sim="${k}"><small>${h}</small></label>`;
+  const same=(o)=>['v','p','m','f'].every(x=>o[x]===s[x]);
+  return `<div class="simx"><div class="sim-ctl"><div class="sim-chips"><span>Base</span>${PI.map(k=>`<button class="sim-chip${s.k===k?' on':''}" data-simk="${k}">${NMS[k]||k}</button>`).join('')}</div>
+     <div class="sim-chips"><span>Cenário</span>${SIMPR.map(([l,o],i)=>`<button class="sim-chip${same(o)?' on':''}" data-simp="${i}">${l}</button>`).join('')}</div>
+     ${sl('v','Volume vendido',-50,50,'quantidade de m³ e itens vendidos')}${sl('p','Preço de venda',-30,30,'desconto ou reajuste na tabela')}${sl('m','Custo da matéria-prima',-30,50,'preço da tora e da madeira comprada')}${sl('f','Custos e despesas fixos',-30,50,'folha, depreciação e estrutura')}</div>
+    <div id="simOut"></div></div>`;}
+function simOut(){const c=simCalc(),el=document.getElementById('simOut');if(!el) return;
+  const pct=(a,b)=>{if(Math.abs(a-b)<0.5) return '<em>—</em>';const d=b?varH(a,b):0;return `<em class="${a>=b?'up':'dn'}">${a>=b?'▲':'▼'} ${fP(Math.abs(d))}</em>`;};
+  const inv=(a,b)=>{if(Math.abs(a-b)<0.5) return '<em>—</em>';return `<em class="${a<=b?'up':'dn'}">${a>b?'▲':'▼'} ${fP(Math.abs(varH(a,b)))}</em>`;};
+  const mo=v=>isFinite(v)?'R$ '+fM0(v):'não atingível',neg=v=>v<0?' neg':'';
+  const rows=[['Receita',c.R,c.R2,pct],['(−) Custos e despesas variáveis',c.CV,c.CV2,inv],['(=) Margem de contribuição',c.MC,c.MC2,pct],['(−) Custos e despesas fixos',c.CF,c.CF2,inv],['(=) Resultado',c.RS,c.RS2,pct]];
+  const s=DK.sim,any=s.v||s.p||s.m||s.f;let tip;
+  if(!any) tip='Escolha um cenário ou mova os controles: receita, margem, equilíbrio e risco são recalculados na hora.';
+  else if(c.RS2<0) tip=`<b>Prejuízo</b>: a receita simulada ficou abaixo do ponto de equilíbrio contábil de ${mo(c.PEC2)}.`;
+  else if(s.v&&!s.p&&!s.m&&!s.f) tip=`Pelo GAO de ${fN(c.GAO,2)}, uma variação de ${s.v>0?'+':''}${s.v}% no volume altera o resultado em cerca de ${fN(c.GAO*s.v,1)}%; o simulador mostra ${fN(varH(c.RS2,c.RS)*100,1)}%.`;
+  else tip=isFinite(c.vReq)?`Para manter o resultado realizado de R$ ${fM0(c.RS)} nesse cenário, o volume precisaria variar <b>${c.vReq>=1?'+':''}${fN((c.vReq-1)*100,1)}%</b>.`:'Nesse cenário a margem de contribuição fica negativa: nenhum volume cobre os gastos.';
+  el.innerHTML=`<table class="s-tb tight simt"><thead><tr><th></th><th class="r">Realizado</th><th class="r">Simulado</th><th class="r">Variação</th></tr></thead><tbody>${rows.map(([l,a,b,f],i)=>`<tr class="${i===4?'res':i===2?'sub':''}"><td>${l}</td><td class="r">R$ ${fM0(a)}</td><td class="r"><b class="${neg(b)}">R$ ${fM0(b)}</b></td><td class="r">${f(b,a)}</td></tr>`).join('')}</tbody></table>
+   <div class="sim-k">${[['Índice de MC',fP(c.MCp2),'realizado '+fP(c.MCp)],['Ponto de equilíbrio contábil',mo(c.PEC2),c.pr2&&isFinite(c.PEC2)?'≈ '+fN(c.PEC2/c.pr2,0)+' m³':''],['Margem de segurança',isFinite(c.MS2)?fP(c.MS2):'—','realizado '+fP(c.MS)],['Alavancagem (GAO)',c.GAO2!=null?fN(c.GAO2,2):'—','realizado '+fN(c.GAO,2)]].map(([k,v,d])=>`<div><span>${k}</span><b>${v}</b><em>${d}</em></div>`).join('')}</div>
+   <div class="s-callout sm">${tip}</div>`;}
+function simBind(){const set=()=>{document.querySelectorAll('[data-simp]').forEach(b=>{const o=SIMPR[+b.dataset.simp][1];b.classList.toggle('on',['v','p','m','f'].every(x=>o[x]===DK.sim[x]));});};
+  document.querySelectorAll('[data-sim]').forEach(r=>r.oninput=()=>{DK.sim[r.dataset.sim]=+r.value;const b=document.getElementById('sv-'+r.dataset.sim);if(b)b.textContent=(r.value>0?'+':'')+r.value+'%';set();simOut();});
+  document.querySelectorAll('[data-simk]').forEach(b=>b.onclick=e=>{e.stopPropagation();DK.sim.k=+b.dataset.simk;renderDeck();});
+  document.querySelectorAll('[data-simp]').forEach(b=>b.onclick=e=>{e.stopPropagation();Object.assign(DK.sim,SIMPR[+b.dataset.simp][1]);renderDeck();});
+  simOut();}
 /* ---- deck rendering & navigation ---- */
 let SLIDES=[];
 function visSlides(){const h=dkHidden();return SLIDES.map((s,i)=>({s,i})).filter(x=>!(DK.full&&h.includes(x.s.id)));}
@@ -5271,6 +5319,63 @@ function perUI(){const btn=document.getElementById('perBtn');if(!btn) return;btn
 
 html[data-theme] .sl .s-tb th{background:#02366F!important;color:#fff!important}
 .sl .s-foot .s-brand.u-trace{display:inline;color:#5B6B82;font-size:12px}
+</style>
+<style id="deck-fix">
+/* tela cheia: a animação de entrada da página criava um bloco de contenção e prendia o slide numa faixa de 200 px */
+body.deck-full #v-apt,body.deck-full .v-in{animation:none!important;transform:none!important;filter:none!important}
+body.deck-full .dk{position:fixed!important;inset:0!important;width:100vw;height:100vh;display:flex;flex-direction:column}
+body.deck-full .dk-stage{position:relative;flex:1 1 auto;width:100%;height:100%!important;min-height:0;max-height:none!important;aspect-ratio:auto!important}
+body.deck-full .dk-notes,body.deck-full .dk-over{display:none!important}
+body.deck-full .vu-fab{display:none!important}
+/* referencial */
+.s-q.sm{font-size:21px}
+.sl .g2 .s-kp>b{font-size:24px}.sl .g2 .s-kp>em{font-size:16px}
+/* história e estrutura */
+.hs{display:grid;grid-template-columns:1.1fr 1fr;gap:34px;align-items:start}
+.hs-l p{font-size:17px;line-height:1.55;margin:0 0 10px}
+.hs-logo{float:right;width:88px;height:88px;object-fit:contain;border:1px solid var(--line);border-radius:14px;background:#fff;margin:0 0 8px 14px;padding:6px}
+.hs-l h4,.hs-r h4{margin-top:4px}
+.hs-tl{list-style:none;margin:0;padding:0 0 0 18px;border-left:3px solid var(--gold)}
+.hs-tl li{position:relative;display:grid;grid-template-columns:62px 1fr;gap:10px;font-size:15px;line-height:1.4;margin-bottom:8px}
+.hs-tl li::before{content:"";position:absolute;left:-26px;top:5px;width:13px;height:13px;border-radius:50%;background:var(--surface);border:3px solid var(--brand)}
+.hs-tl b{color:var(--head);font-family:var(--mono);font-size:14px}.hs-tl span{color:var(--ink-2)}
+.org{display:flex;flex-direction:column;align-items:center}
+.org b{display:block;color:var(--head);font-size:16px;line-height:1.25}.org span{display:block;font-size:13px;line-height:1.35;color:var(--ink-3);margin-top:4px}
+.org i{display:inline-block;font-style:normal;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--accent-2);background:var(--accent-l);border-radius:20px;padding:2px 9px;margin-top:7px}
+.org-hd{background:var(--brand);border-radius:12px;padding:12px 20px;text-align:center;min-width:56%}
+.org-hd b{color:#fff}.org-hd span{color:rgba(255,255,255,.82)}.org-hd i{background:rgba(255,255,255,.18);color:#fff}
+.org-ln{width:calc(100% - 100% / var(--n));height:18px;border:2px solid var(--line);border-bottom:0;border-radius:8px 8px 0 0;margin-top:18px;position:relative}
+.org-ln::before{content:"";position:absolute;left:50%;top:-20px;height:18px;border-left:2px solid var(--line)}
+.org-row{display:grid;grid-template-columns:repeat(var(--n),1fr);gap:10px;width:100%}
+.org-row>div{background:var(--surface-2);border:1px solid var(--line);border-top:3px solid var(--gold);border-radius:10px;padding:10px 12px;text-align:center}
+.hs-r .s-tags{margin-top:16px;justify-content:center}.hs-r .s-tags span{font-size:13px;padding:3px 12px}
+/* processo */
+.s-flow2{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;counter-reset:f}
+.s-flow2>div{position:relative;background:var(--surface-2);border:1px solid var(--line);border-radius:12px;padding:14px 14px 16px}
+.s-flow2>div:not(:last-child)::after{content:"›";position:absolute;right:-12px;top:20px;font-size:22px;color:var(--gold);font-weight:700}
+.s-flow2 i{font-style:normal;width:30px;height:30px;border-radius:50%;background:var(--brand);color:var(--on-brand);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;margin-bottom:10px}
+.s-flow2 b{display:block;color:var(--head);font-size:17px;line-height:1.25}.s-flow2 span{display:block;font-size:14px;line-height:1.4;color:var(--ink-3);margin-top:6px}
+/* tabelas por agrupamento */
+.sl .s-tb.grp td{font-size:14.5px;padding:6px 12px!important}.sl .s-tb.grp th{font-size:11.5px;padding:8px 12px!important}
+.sl .s-tb.grp td b{font-size:14.5px}.s-tb.grp .s-hb-t{height:5px;margin-top:4px;max-width:260px}
+.sl .s-tb.grp tr.tot td{border-top:2px solid var(--line);background:var(--row-key)}
+/* simulador */
+.simx{display:grid;grid-template-columns:400px 1fr;gap:30px;align-items:start}
+.s-sim .sim-ctl{gap:12px}
+.sim-chips{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.sim-chips>span{width:100%;font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;color:var(--ink-3)}
+.sim-chip{border:1px solid var(--line);background:var(--surface-2);color:var(--ink-2);border-radius:20px;padding:4px 12px;font:600 13px var(--font);cursor:pointer;transition:background .15s,border-color .15s}
+.sim-chip:hover{border-color:var(--accent)}.sim-chip.on{background:var(--brand);border-color:var(--brand);color:var(--on-brand)}
+.s-sim .sim-s span{font-size:15px;margin-bottom:2px}.s-sim .sim-s input{height:18px;margin:0}.s-sim .sim-s small{display:block;font-size:12px;color:var(--ink-4);margin-top:-2px}
+.sl .s-tb.simt td{font-size:15px;padding:7px 12px!important}.sl .s-tb.simt th{font-size:11.5px;padding:7px 12px!important}
+.s-tb.simt b{color:var(--head)}.s-tb.simt b.neg{color:var(--neg)}
+.s-tb.simt em{font-style:normal;font-weight:700;font-size:13px;color:var(--ink-4)}.s-tb.simt em.up{color:var(--pos)}.s-tb.simt em.dn{color:var(--neg)}
+.sl .s-tb.simt tr.sub td{background:var(--surface-2)}.sl .s-tb.simt tr.res td{background:var(--row-key);font-weight:700}.sl .s-tb.simt tr.res b{font-size:17px}
+.sim-k{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:12px}
+.sim-k>div{background:var(--surface-2);border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:10px;padding:8px 12px}
+.sim-k span{display:block;font-size:10.5px;letter-spacing:.07em;text-transform:uppercase;font-weight:700;color:var(--ink-3);line-height:1.3}
+.sim-k b{display:block;font-size:18px;color:var(--head);margin:3px 0 1px;white-space:nowrap}.sim-k em{display:block;font-style:normal;font-size:12px;color:var(--ink-3)}
+.s-sim .s-callout.sm{margin-top:10px;font-size:14.5px;padding:9px 14px}
 </style>
 </body>
 </html>
