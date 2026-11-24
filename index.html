@@ -4042,7 +4042,7 @@ function renderIni(){
       <div class="kicker">Trabalho de Conclusão de Curso · Ciências Contábeis · Unoesc</div>
       <h1>${esc(DATA.title.charAt(0)+DATA.title.slice(1).toLowerCase())}</h1>
       <p class="ini-auth">${esc(edGet('idt-aut','Lucas Chemin Negri e Luiz Fernando Corti'))} · Orientação: ${esc(edGet('idt-ori','Prof.ª Ananda Zaehler'))} · ${esc(edGet('idt-ano','São Miguel do Oeste, 2026'))}</p>
-      <div class="ini-cta"><button class="btn primary" onclick="show('fin')">${ic('fin')}Ver os resultados</button><button class="btn ghost-l" onclick="ST.relTab='doc';show('rel');renderRel()">${ic('rel')}Ler o TCC</button><button class="btn ghost-l" onclick="setPref('present','on')">${ic('present')}Modo apresentação</button></div>
+      <div class="ini-cta"><button class="btn primary" onclick="show('fin')">${ic('fin')}Ver os resultados</button><button class="btn ghost-l" onclick="setPref('present','on')">${ic('present')}Modo apresentação</button></div>
     </div>
   </section>
 
@@ -4138,7 +4138,7 @@ function renderIni(){
       ${link('abc','Grupos que concentram a receita')}
       ${link('cus','Gastos fixos e variáveis classificados')}
       ${link('mem','Todas as contas com os valores')}
-      ${link('rel','TCC na íntegra e relatório de resultados')}
+      ${link('vx-sim','Testar preço, volume e custos no simulador')}
     </div>
   </section>`;
 }
@@ -4924,7 +4924,8 @@ function pwOverride(u){return lsGet('cvl-pw:'+u,null);}
 function checkPw(u,p){const U=USERS[u];if(!U) return false;const o=pwOverride(u);return o?o===sha256('cvl|'+u+'|'+p):U.p===p;}
 let CUR=null;
 const roleOf=()=>CUR?ROLES[CUR.r]:ROLES.autor;
-const canView=v=>{const r=roleOf();return !r.views||r.views.includes(v);};
+const ACAD_OFF=['apt','apr','idt','tema','met','rel'];
+const canView=v=>{if(ACAD_OFF.includes(v)) return false;const r=roleOf();return !r.views||r.views.includes(v);};
 doLogin=function(e){
   e.preventDefault();
   const u=document.getElementById('user').value.trim().toLowerCase(),p=document.getElementById('pass').value;
@@ -6998,12 +6999,12 @@ Object.keys(NEWV).forEach(function(k){var n=NEWV[k];VIEWS[k]={g:n[0],t:n[1],d:n[
 /* ---------- navegação em abas ---------- */
 var SECS=[['ini','Início',['ini']],['emp','Empresa',['emp','rh']],['exe','Executivo',['vx-exe','vx-seg']],['res','Resultados',['fin','vx-uni','ser','cus','vx-saz','proj','vx-orc','orc']],['ven','Vendas e produtos',['fat','grp','mes','abc','vx-mix','pmin']],
   ['cx','Caixa e dívidas',['vx-c13','dfc','ciclo','end','cbk']],['ctb','Contábil',['ctb','dgn','pdc']],['ges','Gestão',['vx-sim','vx-val','acao','alr','rex']],
-  ['aud','Auditoria',['con','mem','src']],['aca','Trabalho acadêmico',['apt','apr','idt','tema','met','rel']]];
+  ['aud','Auditoria',['con','mem','src']]];
 var SICO={ini:'M3 11l9-7 9 7M5 10v10h14V10M10 20v-6h4v6',emp:'M3 21h18M5 21V7l7-4 7 4v14M9 9h1M14 9h1M9 13h1M14 13h1M10 21v-4h4v4',exe:'M4 15a8 8 0 1 1 16 0M12 15l4-5M4 19h16',res:'M4 20V10M10 20V4M16 20v-7M22 20H2',ven:'M20.6 13.4 13.4 20.6a2 2 0 0 1-2.8 0L3 13V3h10l7.6 7.6a2 2 0 0 1 0 2.8zM7.5 7.5h.01',cx:'M3 7h18v12H3zM3 11h18M16 15h2',ctb:'M4 4h11a3 3 0 0 1 3 3v13H7a3 3 0 0 1-3-3zM18 20h2V6M8 9h6M8 13h6',ges:'M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18zM15.5 8.5l-2 5-5 2 2-5z',aud:'M9 11l3 3 8-8M20 12v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h9',aca:'M2 9l10-5 10 5-10 5zM6 11v5c0 1 3 3 6 3s6-2 6-3v-5'};
 var NEWK=['vx-uni','vx-exe','vx-seg','vx-saz','vx-mix','vx-sim','vx-c13','vx-orc','vx-val'];
 var LAY=[];
 function collect(){var items=[];(typeof NAVS!=='undefined'?NAVS:[]).forEach(function(s){if(s.single) items.push({v:s.single});else (s.items||[]).forEach(function(it){items.push({v:it.v,l:it.l,a:it.a});});});
-  var ok=function(v){return !!VIEWS[v]&&!!document.getElementById('v-'+v);};
+  var ok=function(v){return !!VIEWS[v]&&!!document.getElementById('v-'+v)&&(typeof canView!=='function'||canView(v));};
   var used={},lay=SECS.map(function(s){var its=[];s[2].forEach(function(v){if(NEWK.indexOf(v)>=0){its.push({v:v});used[v]=1;return;}var hit=false;items.forEach(function(it){if(it.v===v&&ok(v)){its.push(it);used[v]=1;hit=true;}});if(!hit&&s[0]==='aca'&&ok(v)&&(typeof canView!=='function'||canView(v))){its.push({v:v});used[v]=1;}});return {k:s[0],t:s[1],items:its};});
   var rest=items.filter(function(it){return !used[it.v]&&ok(it.v)&&it.v!=='atu';});if(rest.length){var a=lay.find(function(s){return s.k==='aud';});a.items=a.items.concat(rest);}
   return lay.filter(function(s){return s.items.length;});}
